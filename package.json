@@ -1,0 +1,27 @@
+{
+  "name": "token",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chainscore/token.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Chainscore/token/issues"
+  },
+  "homepage": "https://github.com/Chainscore/token#readme",
+  "dependencies": {
+    "@openzeppelin/contracts-upgradeable": "^4.4.0",
+    "@openzeppelin/truffle-upgrades": "^1.11.0",
+    "@truffle/hdwallet-provider": "^1.7.0",
+    "dotenv": "^10.0.0",
+    "fs": "0.0.1-security"
+  }
+}
