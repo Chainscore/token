@@ -11,12 +11,26 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20VotesUpg
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
+import "./ERC677Receiver.sol";
+import "./IERC677.sol";
+
 /// @custom:security-contact prasad@chainscore.finance
-contract ChainScore is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, ERC20SnapshotUpgradeable, OwnableUpgradeable, PausableUpgradeable, ERC20PermitUpgradeable, ERC20VotesUpgradeable, UUPSUpgradeable {
+contract ChainScore is
+    Initializable,
+    ERC20Upgradeable,
+    ERC20BurnableUpgradeable,
+    ERC20SnapshotUpgradeable,
+    OwnableUpgradeable,
+    PausableUpgradeable,
+    ERC20PermitUpgradeable,
+    ERC20VotesUpgradeable,
+    UUPSUpgradeable,
+    IERC677
+{
     /// @custom:oz-upgrades-unsafe-allow constructor
     // constructor() initializer {}
 
-    function initialize() initializer public {
+    function initialize() public initializer {
         __ERC20_init("ChainScore", "SCORE");
         __ERC20Burnable_init();
         __ERC20Snapshot_init();
@@ -25,7 +39,7 @@ contract ChainScore is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable
         __ERC20Permit_init("ChainScore");
         __UUPSUpgradeable_init();
 
-        _mint(msg.sender, 1000000000 * 10 ** decimals());
+        _mint(msg.sender, 1000000000 * 10**decimals());
     }
 
     function snapshot() public onlyOwner {
@@ -44,26 +58,31 @@ contract ChainScore is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable
         _mint(to, amount);
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount)
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    )
         internal
-        whenNotPaused
         override(ERC20Upgradeable, ERC20SnapshotUpgradeable)
+        whenNotPaused
     {
         super._beforeTokenTransfer(from, to, amount);
     }
 
     function _authorizeUpgrade(address newImplementation)
         internal
-        onlyOwner
         override
+        onlyOwner
     {}
 
     // The following functions are overrides required by Solidity.
 
-    function _afterTokenTransfer(address from, address to, uint256 amount)
-        internal
-        override(ERC20Upgradeable, ERC20VotesUpgradeable)
-    {
+    function _afterTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal override(ERC20Upgradeable, ERC20VotesUpgradeable) {
         super._afterTokenTransfer(from, to, amount);
     }
 
@@ -79,5 +98,39 @@ contract ChainScore is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable
         override(ERC20Upgradeable, ERC20VotesUpgradeable)
     {
         super._burn(account, amount);
+    }
+
+    // ERC677
+
+    function transferAndCall(
+        address _to,
+        uint256 _value,
+        bytes memory _data
+    ) public returns (bool success) {
+        super.transfer(_to, _value);
+        emit Transfer(msg.sender, _to, _value, _data);
+        if (isContract(_to)) {
+            contractFallback(_to, _value, _data);
+        }
+        return true;
+    }
+
+    // PRIVATE
+
+    function contractFallback(
+        address _to,
+        uint256 _value,
+        bytes memory _data
+    ) private {
+        ERC677Receiver receiver = ERC677Receiver(_to);
+        receiver.onTokenTransfer(msg.sender, _value, _data);
+    }
+
+    function isContract(address _addr) private view returns (bool hasCode) {
+        uint256 length;
+        assembly {
+            length := extcodesize(_addr)
+        }
+        return length > 0;
     }
 }
