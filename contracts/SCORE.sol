@@ -106,7 +106,7 @@ contract ChainScore is
         address _to,
         uint256 _value,
         bytes memory _data
-    ) public returns (bool success) {
+    ) public override returns (bool success) {
         super.transfer(_to, _value);
         emit Transfer(msg.sender, _to, _value, _data);
         if (isContract(_to)) {
@@ -114,8 +114,6 @@ contract ChainScore is
         }
         return true;
     }
-
-    // PRIVATE
 
     function contractFallback(
         address _to,
