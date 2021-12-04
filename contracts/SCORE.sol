@@ -10,9 +10,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20Pe
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20VotesUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-
-import "./ERC677Receiver.sol";
-import "./IERC677.sol";
+import "./ERC677/ERC677Upgradable.sol";
 
 /// @custom:security-contact prasad@chainscore.finance
 contract ChainScore is
@@ -25,7 +23,7 @@ contract ChainScore is
     ERC20PermitUpgradeable,
     ERC20VotesUpgradeable,
     UUPSUpgradeable,
-    IERC677
+    ERC677Upgradable
 {
     /// @custom:oz-upgrades-unsafe-allow constructor
     // constructor() initializer {}
@@ -33,6 +31,7 @@ contract ChainScore is
     function initialize() public initializer {
         __ERC20_init("ChainScore", "SCORE");
         __ERC20Burnable_init();
+        __ERC677_init();
         __ERC20Snapshot_init();
         __Ownable_init();
         __Pausable_init();
@@ -99,36 +98,5 @@ contract ChainScore is
     {
         super._burn(account, amount);
     }
-
-    // ERC677
-
-    function transferAndCall(
-        address _to,
-        uint256 _value,
-        bytes memory _data
-    ) public override returns (bool success) {
-        super.transfer(_to, _value);
-        emit Transfer(msg.sender, _to, _value, _data);
-        if (isContract(_to)) {
-            contractFallback(_to, _value, _data);
-        }
-        return true;
-    }
-
-    function contractFallback(
-        address _to,
-        uint256 _value,
-        bytes memory _data
-    ) private {
-        ERC677Receiver receiver = ERC677Receiver(_to);
-        receiver.onTokenTransfer(msg.sender, _value, _data);
-    }
-
-    function isContract(address _addr) private view returns (bool hasCode) {
-        uint256 length;
-        assembly {
-            length := extcodesize(_addr)
-        }
-        return length > 0;
-    }
+    
 }

@@ -69,7 +69,7 @@ module.exports = {
     // },
 
     harmony_testnet: {
-      provider: () => new HDWalletProvider(mnemonic, `http://169.61.51.169:9500`),
+      provider: () => new HDWalletProvider(mnemonic, `https://api.s0.pops.one/`),
       network_id: 1666700000,       // Testnet's id
     },
 
