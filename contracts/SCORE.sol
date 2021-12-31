@@ -28,7 +28,7 @@ contract ChainScore is
     /// @custom:oz-upgrades-unsafe-allow constructor
     // constructor() initializer {}
 
-    function initialize() public initializer {
+    function initialize(uint _supply) public initializer {
         __ERC20_init("ChainScore", "SCORE");
         __ERC20Burnable_init();
         __ERC677_init();
@@ -38,7 +38,7 @@ contract ChainScore is
         __ERC20Permit_init("ChainScore");
         __UUPSUpgradeable_init();
 
-        _mint(msg.sender, 1000000000 * 10**decimals());
+        _mint(msg.sender, _supply * 10**decimals());
     }
 
     function snapshot() public onlyOwner {
