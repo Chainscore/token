@@ -48,6 +48,7 @@ module.exports = {
       port: 8545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
     },
+
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
@@ -55,7 +56,7 @@ module.exports = {
     // gas: 8500000,           // Gas sent with each transaction (default: ~6700000)
     // gasPrice: 20000000000,  // 20 gwei (in wei) (default: 100 gwei)
     // from: <address>,        // Account to send txs from (default: accounts[0])
-    // websocket: true        // Enable EventEmitter interface for web3 (default: false)
+    // websocket: true         // Enable EventEmitter interface for web3 (default: false)
     // },
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
@@ -71,6 +72,11 @@ module.exports = {
     harmony_testnet: {
       provider: () => new HDWalletProvider(mnemonic, `https://api.s0.pops.one/`),
       network_id: 1666700000,       // Testnet's id
+    },
+
+    harmony_mainnet: {
+      provider: () => new HDWalletProvider(mnemonic, `https://api.s0.t.hmny.io/`),
+      network_id: 1666600000,       // Mainnet's id
     },
 
     // Useful for private networks

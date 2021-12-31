@@ -26,7 +26,7 @@ contract ChainScore is
     ERC677Upgradable
 {
     /// @custom:oz-upgrades-unsafe-allow constructor
-    // constructor() initializer {}
+    constructor() initializer {}
 
     function initialize(uint _supply) public initializer {
         __ERC20_init("ChainScore", "SCORE");
