@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Chainscore/token#readme",
   "dependencies": {
+    "@openzeppelin/contracts": "^4.4.1",
     "@openzeppelin/contracts-upgradeable": "^4.4.0",
     "@openzeppelin/truffle-upgrades": "^1.11.0",
     "@truffle/hdwallet-provider": "^1.7.0",

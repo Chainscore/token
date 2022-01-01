@@ -1,45 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.2;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20SnapshotUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20VotesUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "./ERC677/ERC677Upgradable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Snapshot.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol";
+
+import "./ERC677/ERC677.sol";
 
 /// @custom:security-contact prasad@chainscore.finance
-contract ChainScore is
-    Initializable,
-    ERC20Upgradeable,
-    ERC20BurnableUpgradeable,
-    ERC20SnapshotUpgradeable,
-    OwnableUpgradeable,
-    PausableUpgradeable,
-    ERC20PermitUpgradeable,
-    ERC20VotesUpgradeable,
-    UUPSUpgradeable,
-    ERC677Upgradable
-{
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() initializer {}
-
-    function initialize(uint _supply) public initializer {
-        __ERC20_init("ChainScore", "SCORE");
-        __ERC20Burnable_init();
-        __ERC677_init();
-        __ERC20Snapshot_init();
-        __Ownable_init();
-        __Pausable_init();
-        __ERC20Permit_init("ChainScore");
-        __UUPSUpgradeable_init();
-
-        _mint(msg.sender, _supply * 10**decimals());
-    }
+contract ChainScore is ERC20, ERC20Burnable, ERC20Snapshot, Ownable, Pausable, ERC20Permit, ERC20Votes, ERC20FlashMint, ERC677 {
+    constructor() ERC20("ChainScore", "SCORE") ERC20Permit("ChainScore") {}
 
     function snapshot() public onlyOwner {
         _snapshot();
@@ -57,46 +32,34 @@ contract ChainScore is
         _mint(to, amount);
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    )
+    function _beforeTokenTransfer(address from, address to, uint256 amount)
         internal
-        override(ERC20Upgradeable, ERC20SnapshotUpgradeable)
         whenNotPaused
+        override(ERC20, ERC20Snapshot)
     {
         super._beforeTokenTransfer(from, to, amount);
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        override
-        onlyOwner
-    {}
-
     // The following functions are overrides required by Solidity.
 
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override(ERC20Upgradeable, ERC20VotesUpgradeable) {
+    function _afterTokenTransfer(address from, address to, uint256 amount)
+        internal
+        override(ERC20, ERC20Votes)
+    {
         super._afterTokenTransfer(from, to, amount);
     }
 
     function _mint(address to, uint256 amount)
         internal
-        override(ERC20Upgradeable, ERC20VotesUpgradeable)
+        override(ERC20, ERC20Votes)
     {
         super._mint(to, amount);
     }
 
     function _burn(address account, uint256 amount)
         internal
-        override(ERC20Upgradeable, ERC20VotesUpgradeable)
+        override(ERC20, ERC20Votes)
     {
         super._burn(account, amount);
     }
-    
 }
